@@ -1,0 +1,8 @@
+build/
+cmake-build-debug/
+Projects/
+src/Archive.zip
+.idea/
+.DS_Store
+old/
+.vscode/
