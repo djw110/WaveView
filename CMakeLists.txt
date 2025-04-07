@@ -86,7 +86,10 @@ set(B_TARGET "src")
 
 # Set source files
 file(GLOB VENDORS_SOURCES ${glad_SOURCE_DIR}/src/glad.c)
-file(GLOB KISSFFT_SOURCES ${B_TARGET}/util/kissfft/*.c)
+file(GLOB_RECURSE DEP_HEADERS dep/*.h)# Recursively find .c files
+file(GLOB_RECURSE DEP_SOURCES_C dep/*.c)
+file(GLOB_RECURSE DEP_SOURCES_CPP dep/*.cpp)
+list(APPEND DEP_SOURCES ${DEP_SOURCES_C} ${DEP_SOURCES_CPP})
 file(GLOB_RECURSE PROJECT_HEADERS ${B_TARGET}/*.h)
 file(GLOB_RECURSE PROJECT_SOURCES ${B_TARGET}/*.cpp)
 file(GLOB PROJECT_CONFIGS CMakeLists.txt
@@ -99,7 +102,7 @@ file(GLOB PROJECT_CONFIGS CMakeLists.txt
 source_group("Headers" FILES ${PROJECT_HEADERS})
 source_group("Sources" FILES ${PROJECT_SOURCES})
 source_group("Vendors" FILES ${VENDORS_SOURCES})
-source_group("KissFFT" FILES ${KISSFFT_SOURCES})
+source_group("Dependencies" FILES ${DEP_SOURCES})
 
 # Important GLFW definitions
 add_definitions(-DGLFW_INCLUDE_NONE
@@ -109,6 +112,9 @@ add_definitions(-DGLFW_INCLUDE_NONE
 # Create executable
 add_executable(${PROJECT_NAME} ${PROJECT_SOURCES} ${PROJECT_HEADERS}
                                ${PROJECT_SHADERS} ${PROJECT_CONFIGS}
-                               ${VENDORS_SOURCES} ${KISSFFT_SOURCES})
+                               ${VENDORS_SOURCES} ${DEP_SOURCES}
+                               ${DEP_HEADERS})
 # Include libraries
 target_link_libraries(${PROJECT_NAME} glfw glm freetype)
+
+target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/dep)

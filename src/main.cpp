@@ -4,10 +4,10 @@
 #include <iostream>
 #include <cmath>
 #include "engine.h"
-#include "util/dr_wav.h"
+#include "dr_wav.h"
 extern "C" {
-    #include "util/kissfft/kiss_fft.h"
-    #include "util/kissfft/kiss_fftr.h"
+    #include "kissfft/kiss_fft.h"
+    #include "kissfft/kiss_fftr.h"
 }
 
 using std::cout, std::endl, std::cerr, std::vector;
@@ -34,24 +34,18 @@ int main(int argc, char *argv[]) {
     vector<vector<float>> frequencyHistory;
     analyzeAudio(wav, frequencyHistory, frameSize, overlap, samplingRate);
 
-    for(int i = 0; i < 1000; ++i){
-        for(float f : frequencyHistory[i]){
-            cout << f << " ";
-        }
-        cout << endl;
-    }
-
     drwav_uninit(&wav);
 
-    // Engine engine;
+    Engine engine;
+    engine.preProcessFreqs(frequencyHistory);
 
-    // while (!engine.shouldClose()) {
-    //     engine.processInput();
-    //     engine.update();
-    //     engine.render();
-    // }
+    while (!engine.shouldClose()) {
+        engine.processInput();
+        engine.update();
+        engine.render();
+    }
 
-    // glfwTerminate();
+    glfwTerminate();
     return 0;
 }
 

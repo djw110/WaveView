@@ -32,6 +32,8 @@ private:
     /// @details Index this array with GLFW_KEY_{key} to get the state of a key.
     bool keys[1024];
 
+    vector<vector<float>> frequencyHistory;
+
     /// keeps track of previous confetti's size
     int lastConfSize;
 
@@ -97,6 +99,8 @@ public:
     /// @brief Renders the game state.
     /// @details Displays/renders objects on the screen.
     void render();
+
+    void preProcessFreqs(vector<vector<float>> freqData);
 
     /* deltaTime variables */
     float deltaTime = 0.0f; // Time between current frame and last frame

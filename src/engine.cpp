@@ -21,6 +21,10 @@ Engine::Engine() : keys() {
 
 Engine::~Engine() {}
 
+void Engine::preProcessFreqs(vector<vector<float>> freqData){
+    frequencyHistory = freqData;
+}
+
 unsigned int Engine::initWindow(bool debug) {
     // glfw: initialize and configure
     glfwInit();
