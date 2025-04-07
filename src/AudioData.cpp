@@ -1,25 +1,26 @@
-#include "AudioEngine.h"
+#include "AudioData.h"
 
-void AudioEngine::hannWindow(vector<drwav_int32>& samples){
+void AudioData::hannWindow(vector<drwav_int32>& samples){
     for (size_t n = 0; n < frameSize; ++n){
         double hannValue = 0.5 * (1 - cos(2 * M_PI * n / (frameSize - 1)));
         samples[n] = static_cast<drwav_int32>(samples[n] * hannValue);
     }
 }
 
-float AudioEngine::getMag(const kiss_fft_cpx& value) {
+float AudioData::getMag(const kiss_fft_cpx& value) {
     return sqrt(value.r * value.r + value.i * value.i);
 }
 
-AudioEngine::AudioEngine(const char* fileName){
+AudioData::AudioData(const char* fileName){
     if (!drwav_init_file(&wav, fileName, NULL)) {
-        cerr << "File not found" << endl;
+        throw std::runtime_error("File not found: '" + std::string(fileName) + "'");
     }
     else {
         cout << "Using file: " << fileName << endl;
     }
 
     totalSamples = wav.totalPCMFrameCount * wav.channels;
+    maxMag = 0.0f;
     
     pDecodedInterleavedPCMFrames = (drwav_int32*) malloc(totalSamples * sizeof(drwav_int32));
     size_t numberOfSamplesActuallyDecoded = drwav_read_pcm_frames_s32(&wav, wav.totalPCMFrameCount, pDecodedInterleavedPCMFrames);
@@ -29,15 +30,16 @@ AudioEngine::AudioEngine(const char* fileName){
     else {
         cout << "Memory allocated" << endl;
     }
+    normalizeData();
 }
 
-AudioEngine::~AudioEngine(){
+AudioData::~AudioData(){
     free(pDecodedInterleavedPCMFrames);
     free(fftCfg);
     drwav_uninit(&wav);
 }
 
-void AudioEngine::preProccess(){
+void AudioData::preProcess(){
     vector<drwav_int32> windowedSamples(frameSize); // A chunk of the decoded samples
     kiss_fft_cpx fftInput[frameSize]; //windowedSamples converted to a complex array
     kiss_fft_cpx fftOutput[frameSize];
@@ -91,11 +93,22 @@ void AudioEngine::preProccess(){
     }
 }
 
-void AudioEngine::printVals(){
+void AudioData::printVals(){
     for(int i = 0; i < 1000; ++i){
         for(float f : frequencyHist[i]){
             cout << f << " ";
         }
         cout << endl;
     }
+}
+
+void AudioData::normalizeData(){
+    for (size_t i = 0; i < totalSamples; ++i) {
+        float normalizedSample = static_cast<float>(pDecodedInterleavedPCMFrames[i]) / 2147483648.0f; // Max 32-bit int is 2^31
+        normalSamples.push_back(normalizedSample);
+    }
+}
+
+vector<float> AudioData::getNormals(){
+    return normalSamples;
 }

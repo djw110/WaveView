@@ -12,18 +12,21 @@ extern "C" {
 
 using std::cout, std::endl, std::cerr, std::vector;
 
-class AudioEngine {
+class AudioData {
     private:
     const size_t frameSize = 1024, overlap = 512;
-    const float sampleRate  = 44100.0f;
-    drwav wav;
-    drwav_int32* pDecodedInterleavedPCMFrames;
     size_t totalSamples;
+    const float sampleRate  = 44100.0f;
+    float maxMag;
+
+    drwav wav;
+    
+    drwav_int32* pDecodedInterleavedPCMFrames;
 
     vector<vector<float>> frequencyHist;
     vector<vector<float>> audioFrames;
     vector<float> bins = {0.0f, 100.0f, 1000.0f, 5000.0f, sampleRate / 2.0f};
-    float maxMag = 0.0f;
+    vector<float> normalSamples;
 
     kiss_fft_cfg fftCfg = kiss_fft_alloc(frameSize, 0, NULL, NULL); // Configuration for the FFT
 
@@ -32,13 +35,17 @@ class AudioEngine {
     float getMag(const kiss_fft_cpx& value);
 
     public:
-    AudioEngine(const char* fileName);
+    AudioData(const char* fileName);
 
-    ~AudioEngine();
+    ~AudioData();
     
-    void preProccess();
+    void preProcess();
 
     void printVals();
+
+    void normalizeData();
+
+    vector<float> getNormals();
 
 };
 

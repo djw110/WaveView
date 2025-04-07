@@ -12,15 +12,17 @@ extern "C" {
 
 using std::cout, std::endl, std::cerr, std::vector;
 
-
-
 int main(int argc, char *argv[]) {
 
-    Engine engine;
+    std::unique_ptr<AudioData> aud = std::make_unique<AudioData>(argv[1]);
+    aud->preProcess();
 
-    std::unique_ptr<AudioEngine> aud = std::make_unique<AudioEngine>(argv[1]);
-    aud->preProccess();
-    aud->printVals();
+    vector<float> norms = aud->getNormals();
+
+    std::unique_ptr<Playback> pb = std::make_unique<Playback>(norms);
+    pb->start();
+
+    // Engine engine;
 
     // while (!engine.shouldClose()) {
     //     engine.processInput();
@@ -28,6 +30,7 @@ int main(int argc, char *argv[]) {
     //     engine.render();
     // }
 
+    pb->stop();
     // glfwTerminate();
     return 0;
 }
