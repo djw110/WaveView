@@ -11,9 +11,6 @@ Engine::Engine() : keys() {
     this->initShaders();
     this->initShapes();
 
-    lastConfSize = 1;
-    spawnClicked = false;
-
     originalFill = {1, 0, 0, 1};
     hoverFill.vec = originalFill.vec + vec4{0.5, 0.5, 0.5, 0};
     pressFill.vec = originalFill.vec - vec4{0.5, 0.5, 0.5, 0};
@@ -74,18 +71,7 @@ void Engine::initShaders() {
 }
 
 void Engine::initShapes() {
-    float squareSize = (height - (4) * 30) / 6;
-    float margin = squareSize / 2;
 
-    for (int row = 0; row < 5; ++row) {
-        for (int col = 0; col < 5; ++col) {
-            float x = margin + col * (squareSize + 30) + squareSize / 2;
-            float y = margin + row * (squareSize + 30) + squareSize / 2;
-
-            buttons.push_back(std::make_unique<Rect>(shapeShader, vec2{x, y}, vec2{squareSize, squareSize}, color{1, 1, 1, 1}));
-            outlineButtons.push_back(std::make_unique<Rect>(shapeShader, vec2{x, y}, vec2{squareSize+10, squareSize+10}, color{1, 0, 0, 1}));
-        }
-    }
     hovered.resize(buttons.size(), false);
 }
 
@@ -154,12 +140,6 @@ void Engine::render() {
         }
         case play: {
             shapeShader.use();
-            for(int i = 0; i<hovered.size(); ++i){
-                if(hovered[i]){
-                    outlineButtons[i]->setUniforms();
-                    outlineButtons[i]->draw();
-                }
-            }
             for(unique_ptr<Shape>& c : buttons){
                 c->setUniforms();
                 c->draw();

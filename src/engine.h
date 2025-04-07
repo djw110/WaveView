@@ -1,11 +1,10 @@
 #ifndef GRAPHICS_ENGINE_H
 #define GRAPHICS_ENGINE_H
 
-#include <vector>
 #include <memory>
-#include <iostream>
 #include <GLFW/glfw3.h>
 
+#include "AudioEngine.h"
 #include "shader/shaderManager.h"
 #include "font/fontRenderer.h"
 #include "shapes/rect.h"
@@ -34,12 +33,6 @@ private:
 
     vector<vector<float>> frequencyHistory;
 
-    /// keeps track of previous confetti's size
-    int lastConfSize;
-
-    /// keeps track of spawn point clicks
-    bool spawnClicked;
-
     /// @brief Responsible for loading and storing all the shaders used in the project.
     /// @details Initialized in initShaders()
     unique_ptr<ShaderManager> shaderManager;
@@ -50,7 +43,6 @@ private:
 
     // Shapes
     vector<unique_ptr<Shape>> buttons;
-    vector<unique_ptr<Shape>> outlineButtons;
 
     vector<bool> hovered;
 
@@ -59,7 +51,6 @@ private:
     Shader textShader;
 
     double MouseX, MouseY;
-    bool mousePressedLastFrame = false;
 
     /// @note Call glCheckError() after every OpenGL call to check for errors.
     GLenum glCheckError_(const char *file, int line);
