@@ -25,20 +25,17 @@ int Playback::audioCallback(void* outputBuffer, void*, unsigned int bufferFrames
 
 void Playback::start() {
     RtAudio::StreamParameters outputParams;
-    outputParams.deviceId = dac.getDefaultOutputDevice();
     if (dac.getDeviceCount() < 1){
         cerr << "No audio devices found";
         return;
     }
-    for (unsigned int i = 0; i < dac.getDeviceCount(); ++i) {
-        RtAudio::DeviceInfo info = dac.getDeviceInfo(i);
-        std::cout << "Device " << i << ": " << info.name << std::endl;
-    }
+    outputParams.deviceId = dac.getDefaultOutputDevice();
     outputParams.nChannels = 1;
 
     try {
         dac.openStream(&outputParams, nullptr, RTAUDIO_FLOAT32, 44100, &bufferSize, &Playback::audioCallback, this);
         dac.startStream();
+        cout << "Stream started" << endl;
     } catch (RtAudioErrorType& e) {
         cerr << "RtAudio error"<< endl;
     }
