@@ -11,6 +11,8 @@ set(GLFW_VERSION 3.3.9)
 set(GLM_VERSION 1.0.1)
 set(FREETYPE_VERSION 2.13.2)
 
+set(RTAUDIO_TARGETNAME_UNINSTALL "rtaudio_uninstall" CACHE STRING "" FORCE)
+
 # Do not build other non-important things
 option(GLFW_BUILD_DOCS ON)
 option(GLFW_BUILD_EXAMPLES OFF)
@@ -62,8 +64,23 @@ FetchContent_Declare(
 )
 FetchContent_Populate(glad)
 
-# Include GLAD
+FetchContent_Declare(
+    rtaudio
+    GIT_REPOSITORY https://github.com/thestk/rtaudio.git
+    GIT_TAG master
+)
+FetchContent_MakeAvailable(rtaudio)
+
+FetchContent_Declare(
+    drlibs
+    GIT_REPOSITORY https://github.com/mackron/dr_libs.git
+    GIT_TAG master
+)
+FetchContent_MakeAvailable(drlibs)
+
 include_directories(${glad_SOURCE_DIR}/include)
+include_directories(${rtaudio_SOURCE_DIR})
+include_directories(${drlibs_SOURCE_DIR})
 
 ## ~ COMPILER SETTINGS ~
 
@@ -86,12 +103,12 @@ set(B_TARGET "src")
 
 # Set source files
 file(GLOB VENDORS_SOURCES ${glad_SOURCE_DIR}/src/glad.c)
-file(GLOB_RECURSE DEP_HEADERS dep/*.h)# Recursively find .c files
+file(GLOB_RECURSE PROJECT_HEADERS ${B_TARGET}/*.h)
+file(GLOB_RECURSE PROJECT_SOURCES ${B_TARGET}/*.cpp)
+file(GLOB_RECURSE DEP_HEADERS dep/*.h)
 file(GLOB_RECURSE DEP_SOURCES_C dep/*.c)
 file(GLOB_RECURSE DEP_SOURCES_CPP dep/*.cpp)
 list(APPEND DEP_SOURCES ${DEP_SOURCES_C} ${DEP_SOURCES_CPP})
-file(GLOB_RECURSE PROJECT_HEADERS ${B_TARGET}/*.h)
-file(GLOB_RECURSE PROJECT_SOURCES ${B_TARGET}/*.cpp)
 file(GLOB PROJECT_CONFIGS CMakeLists.txt
                           Readme.md
                          .gitattributes
@@ -115,6 +132,6 @@ add_executable(${PROJECT_NAME} ${PROJECT_SOURCES} ${PROJECT_HEADERS}
                                ${VENDORS_SOURCES} ${DEP_SOURCES}
                                ${DEP_HEADERS})
 # Include libraries
-target_link_libraries(${PROJECT_NAME} glfw glm freetype)
+target_link_libraries(${PROJECT_NAME} glfw glm freetype rtaudio)
 
 target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/dep)

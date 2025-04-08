@@ -5,10 +5,6 @@
 #include <cmath>
 #include "engine.h"
 #include "dr_wav.h"
-extern "C" {
-    #include "kissfft/kiss_fft.h"
-    #include "kissfft/kiss_fftr.h"
-}
 
 using std::cout, std::endl, std::cerr, std::vector;
 
@@ -16,6 +12,7 @@ int main(int argc, char *argv[]) {
 
     std::unique_ptr<AudioData> aud = std::make_unique<AudioData>(argv[1]);
     aud->preProcess();
+    aud->printVals();
 
     vector<float> norms = aud->getNormals();
 

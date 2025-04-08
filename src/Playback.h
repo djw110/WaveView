@@ -1,7 +1,7 @@
 #ifndef PLAYBACK_data_H
 #define PLAYBACK_data_H
 
-#include "rtaudio/RtAudio.h"
+#include "RtAudio.h"
 #include "AudioData.h"
 
 using std::vector;
