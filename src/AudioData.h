@@ -16,12 +16,10 @@ class AudioData {
     private:
     const size_t frameSize = 1024, overlap = 512;
     size_t totalSamples;
-    const float sampleRate  = 44100.0f;
+    float sampleRate;
     float maxMag;
 
     drwav wav;
-    
-    drwav_int32* pDecodedInterleavedPCMFrames;
 
     vector<vector<float>> frequencyHist;
     vector<vector<float>> audioFrames;
@@ -30,7 +28,7 @@ class AudioData {
 
     kiss_fft_cfg fftCfg = kiss_fft_alloc(frameSize, 0, NULL, NULL); // Configuration for the FFT
 
-    void hannWindow(vector<drwav_int32>& samples);
+    void hannWindow(vector<float>& samples);
     
     float getMag(const kiss_fft_cpx& value);
 

@@ -1,9 +1,9 @@
 #include "AudioData.h"
 
-void AudioData::hannWindow(vector<drwav_int32>& samples){
+void AudioData::hannWindow(vector<float>& samples){
     for (size_t n = 0; n < frameSize; ++n){
         double hannValue = 0.5 * (1 - cos(2 * M_PI * n / (frameSize - 1)));
-        samples[n] = static_cast<drwav_int32>(samples[n] * hannValue);
+        samples[n] = (samples[n] * hannValue);
     }
 }
 
@@ -20,34 +20,36 @@ AudioData::AudioData(const char* fileName){
     }
 
     totalSamples = wav.totalPCMFrameCount * wav.channels;
+    sampleRate = wav.sampleRate;
     maxMag = 0.0f;
+
     
-    pDecodedInterleavedPCMFrames = (drwav_int32*) malloc(totalSamples * sizeof(drwav_int32));
-    size_t numberOfSamplesActuallyDecoded = drwav_read_pcm_frames_s32(&wav, wav.totalPCMFrameCount, pDecodedInterleavedPCMFrames);
-    if(!pDecodedInterleavedPCMFrames || numberOfSamplesActuallyDecoded != wav.totalPCMFrameCount){
+    normalSamples.resize(totalSamples);
+    
+    size_t framesDecoded = drwav_read_pcm_frames_f32(&wav, wav.totalPCMFrameCount, normalSamples.data());
+    if(framesDecoded != wav.totalPCMFrameCount){
         cerr << "Memory allocation failed" << endl;
     }
     else {
         cout << "Memory allocated" << endl;
     }
-    normalizeData();
+    
 }
 
 AudioData::~AudioData(){
-    free(pDecodedInterleavedPCMFrames);
     free(fftCfg);
     drwav_uninit(&wav);
 }
 
 void AudioData::preProcess(){
-    vector<drwav_int32> windowedSamples(frameSize); // A chunk of the decoded samples
+    vector<float> windowedSamples(frameSize); // A chunk of the decoded samples
     kiss_fft_cpx fftInput[frameSize]; //windowedSamples converted to a complex array
     kiss_fft_cpx fftOutput[frameSize];
 
     //Break samples into frames
     for (size_t i = 0; i + frameSize <= totalSamples; i += overlap){
         for (size_t j = 0; j < frameSize; ++j){
-            windowedSamples[j] = pDecodedInterleavedPCMFrames[i+j];
+            windowedSamples[j] = normalSamples[i+j];
         }
 
         //Apply hann function to reduce artifacts
@@ -64,25 +66,24 @@ void AudioData::preProcess(){
 
         //Magnitude + binning
         float freqResolution = sampleRate / frameSize;
-        size_t numBins = bins.size();
-        vector<float> binMagnitudes(numBins, 0.0f);
+        vector<float> binMagnitudes(bins.size(), 0.0f);
 
-        for(size_t i = 0; i < frameSize / 2; ++i ){
-            float magnitude = getMag(fftOutput[i]);
-            float frequency = i * freqResolution;
+        for(size_t j = 0; j < frameSize / 2; ++j ){
+            float magnitude = getMag(fftOutput[j]);
+            float frequency = j * freqResolution;
 
             //For each frequency bin, add it's magnitude to the appropriate bin
             for(size_t bindex = 0; bindex < bins.size(); ++bindex){
-                if(frequency >= bins[bindex] && frequency < bins[bindex + 1]){
+                if(frequency >= bins[bindex] && (bindex == bins.size() - 1 || frequency < bins[bindex + 1])){
                     binMagnitudes[bindex] += magnitude;
                     break;
                 }
             }
-            for(float binMag : binMagnitudes){ 
-                maxMag = std::max(maxMag, binMag);
-            }
         }
-        
+        for(float binMag : binMagnitudes){ 
+            maxMag = std::max(maxMag, binMag);
+        }
+
         frequencyHist.push_back(binMagnitudes);
     }
 
@@ -99,13 +100,6 @@ void AudioData::printVals(){
             cout << f << " ";
         }
         cout << endl;
-    }
-}
-
-void AudioData::normalizeData(){
-    for (size_t i = 0; i < totalSamples; ++i) {
-        float normalizedSample = static_cast<float>(pDecodedInterleavedPCMFrames[i]) / 2147483648.0f; // Max 32-bit int is 2^31
-        normalSamples.push_back(normalizedSample);
     }
 }
 

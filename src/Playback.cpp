@@ -11,11 +11,13 @@ int Playback::audioCallback(void* outputBuffer, void*, unsigned int bufferFrames
     float* out = static_cast<float*>(outputBuffer);
 
     for (unsigned int i = 0; i < bufferFrames; ++i) {
-        if (self->samplesPlayed < self->buffer.size()) {
-            out[i] = self->buffer[self->samplesPlayed++];
-        } 
-        else {
-            out[i] = 0.0f; // silence
+        for (unsigned int ch = 0; ch < 2; ++ch){    
+            if (self->samplesPlayed < self->buffer.size()) {
+                out[i * 2 + ch] = self->buffer[self->samplesPlayed++];
+            } 
+            else {
+                out[i * 2 + ch] = 0.0f; // silence
+            }
         }
     }
 
@@ -30,7 +32,7 @@ void Playback::start() {
         return;
     }
     outputParams.deviceId = dac.getDefaultOutputDevice();
-    outputParams.nChannels = 1;
+    outputParams.nChannels = 2;
 
     try {
         dac.openStream(&outputParams, nullptr, RTAUDIO_FLOAT32, 44100, &bufferSize, &Playback::audioCallback, this);
