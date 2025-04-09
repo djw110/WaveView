@@ -10,7 +10,7 @@
 #include "shapes/rect.h"
 #include "shapes/shape.h"
 
-using std::vector, std::unique_ptr, std::make_unique, glm::ortho, glm::mat4, glm::vec3, glm::vec4;
+using std::vector, std::unique_ptr, std:: shared_ptr, std::make_unique, glm::ortho, glm::mat4, glm::vec3, glm::vec4;
 
 /**
  * @brief The Engine class.
@@ -41,6 +41,8 @@ private:
     /// @details Initialized in initShaders()
     unique_ptr<FontRenderer> fontRenderer;
 
+    shared_ptr<Playback> playBack;
+
     // Shapes
     vector<unique_ptr<Shape>> buttons;
 
@@ -60,7 +62,7 @@ private:
 public:
     /// @brief Constructor for the Engine class.
     /// @details Initializes window and shaders.
-    Engine();
+    Engine(const shared_ptr<Playback>& pb);
 
     /// @brief Destructor for the Engine class.
     ~Engine();
@@ -76,8 +78,7 @@ public:
     /// @brief Initializes the shapes to be rendered.
     void initShapes();
 
-    /// @brief Pushes back a new colored rectangle to the confetti vector.
-    void spawnConfetti();
+    void initPlayback(const shared_ptr<Playback>& pb);
 
     /// @brief Processes input from the user.
     /// @details (e.g. keyboard input, mouse input, etc.)

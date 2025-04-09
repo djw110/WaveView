@@ -1,5 +1,5 @@
-#ifndef PLAYBACK_data_H
-#define PLAYBACK_data_H
+#ifndef PLAYBACK_H
+#define PLAYBACK_H
 
 #include "RtAudio.h"
 #include "AudioData.h"
@@ -29,4 +29,4 @@ class Playback {
 };
 
 
-#endif //AUDIO_data_H
+#endif // PLAYBACK_H

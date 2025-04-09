@@ -6,7 +6,7 @@
 #include "engine.h"
 #include "dr_wav.h"
 
-using std::cout, std::endl, std::cerr, std::vector;
+using std::cout, std::endl, std::cerr, std::vector, std::unique_ptr, std::make_unique, std:: make_shared, std::shared_ptr;
 
 int main(int argc, char *argv[]) {
     if(!argv[1]){
@@ -14,10 +14,10 @@ int main(int argc, char *argv[]) {
         return 1;
     }
 
-    std::unique_ptr<AudioData> aud;
+    unique_ptr<AudioData> aud;
 
     try{
-        aud = std::make_unique<AudioData>(argv[1]);
+        aud = make_unique<AudioData>(argv[1]);
     }
     catch(std::runtime_error& e){
         cerr << e.what() << endl;
@@ -27,18 +27,16 @@ int main(int argc, char *argv[]) {
 
     vector<float> norms = aud->getNormals();
 
-    std::unique_ptr<Playback> pb = std::make_unique<Playback>(norms);
-    pb->start();
+    shared_ptr<Playback> pb = make_shared<Playback>(norms);
 
-    Engine engine;
+    unique_ptr<Engine> engine = make_unique<Engine>(pb);
 
-    while (!engine.shouldClose()) {
-        engine.processInput();
-        engine.update();
-        engine.render();
+    while (!engine->shouldClose()) {
+        engine->processInput();
+        engine->update();
+        engine->render();
     }
 
     glfwTerminate();
-    pb->stop();
     return 0;
 }

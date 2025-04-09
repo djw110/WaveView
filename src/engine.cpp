@@ -6,10 +6,11 @@ state screen;
 // Colors
 color originalFill, hoverFill, pressFill;
 
-Engine::Engine() : keys() {
+Engine::Engine(const shared_ptr<Playback>& pb) : keys() {
     this->initWindow();
     this->initShaders();
     this->initShapes();
+    this->initPlayback(pb);
 
     originalFill = {1, 0, 0, 1};
     hoverFill.vec = originalFill.vec + vec4{0.5, 0.5, 0.5, 0};
@@ -75,6 +76,10 @@ void Engine::initShapes() {
     hovered.resize(buttons.size(), false);
 }
 
+void Engine::initPlayback(const shared_ptr<Playback>& pb){
+    playBack = pb;
+}
+
 void Engine::processInput() {
     glfwPollEvents();
 
@@ -87,14 +92,19 @@ void Engine::processInput() {
     }
 
     // Close window if escape key is pressed
-    if (keys[GLFW_KEY_ESCAPE])
+    if (keys[GLFW_KEY_ESCAPE]){
         glfwSetWindowShouldClose(window, true);
+        playBack->stop();
+    }
 
     // Mouse position saved to check for collisions
     glfwGetCursorPos(window, &MouseX, &MouseY);
 
     if (keys[GLFW_KEY_S]){
-        screen = play;
+        if(screen == start){
+            screen = play;
+            playBack->start();
+        }
     }
 
     if(screen == play){
