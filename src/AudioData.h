@@ -43,6 +43,10 @@ class AudioData {
 
     vector<float> getNormals();
 
+    size_t getOverlap(){
+        return overlap;
+    }
+
     vector<vector<float>>& getFreqs();
 
 };

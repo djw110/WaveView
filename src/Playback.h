@@ -26,6 +26,7 @@ class Playback {
     void start();
 
     size_t getFramesPlayed();
+    size_t getSamplesPlayed();
 
     void stop();
 

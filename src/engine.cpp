@@ -147,7 +147,8 @@ void Engine::update() {
     lastFrame = currentFrame;
 
     if(screen == play){
-        size_t framesPlayed = audioPlayback->getFramesPlayed();
+        size_t framesPlayed = audioPlayback->getSamplesPlayed() / dataHandler->getOverlap();
+        cout << framesPlayed << endl;
         for(int i = 0; i < 3; ++i){
             scaleUp(bars[i],frequencyHistory[framesPlayed][i] + 1);
             scaleUp(bars[6-i],frequencyHistory[framesPlayed][i] + 1);

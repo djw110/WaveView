@@ -19,8 +19,8 @@ int Playback::audioCallback(void* outputBuffer, void*, unsigned int bufferFrames
                 out[i * 2 + ch] = 0.0f; // silence
             }
         }
+        self->framesPlayed++;
     }
-    self->framesPlayed++;
 
     return 0;
 }
@@ -55,4 +55,8 @@ void Playback::stop() {
 
 size_t Playback::getFramesPlayed(){ 
     return framesPlayed; 
+}
+
+size_t Playback::getSamplesPlayed(){ 
+    return samplesPlayed; 
 }
