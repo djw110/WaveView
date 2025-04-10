@@ -22,7 +22,7 @@ private:
     GLFWwindow* window{};
 
     /// @brief The width and height of the window.
-    const unsigned int width = 1500, height = 900; // Window dimensions
+    const unsigned int width = 1200, height = 900; // Window dimensions
     /// @brief The projection matrix
     const glm::mat4 projection = glm::ortho(0.0f, (float)width, 0.0f, (float)height);
 
@@ -41,7 +41,10 @@ private:
     /// @details Initialized in initShaders()
     unique_ptr<FontRenderer> fontRenderer;
 
-    shared_ptr<Playback> audioHandler;
+    unsigned int pj = 0;
+
+    shared_ptr<Playback> audioPlayback;
+    shared_ptr<AudioData> dataHandler;
 
     // Shapes
     vector<unique_ptr<Shape>> bars;
@@ -62,7 +65,7 @@ private:
 public:
     /// @brief Constructor for the Engine class.
     /// @details Initializes window and shaders.
-    Engine(const shared_ptr<Playback>& pb);
+    Engine(const shared_ptr<AudioData>& ad);
 
     /// @brief Destructor for the Engine class.
     ~Engine();
@@ -78,7 +81,9 @@ public:
     /// @brief Initializes the shapes to be rendered.
     void initShapes();
 
-    void initPlayback(const shared_ptr<Playback>& pb);
+    void initPlayback();
+
+    void initData(const shared_ptr<AudioData>& ad);
 
     /// @brief Processes input from the user.
     /// @details (e.g. keyboard input, mouse input, etc.)
@@ -93,8 +98,6 @@ public:
     void render();
 
     void scaleUp(unique_ptr<Shape>& shape, float scale);
-
-    void preProcessFreqs(vector<vector<float>> freqData);
 
     /* deltaTime variables */
     float deltaTime = 0.0f; // Time between current frame and last frame

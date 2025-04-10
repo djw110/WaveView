@@ -87,11 +87,11 @@ void AudioData::preProcess(){
         frequencyHist.push_back(binMagnitudes);
     }
 
-    for(vector<float>& frame : frequencyHist){
-        for(float& f : frame){
-            f = f/maxMag;
-        }
-    }
+    // for(vector<float>& frame : frequencyHist){
+    //     for(float& f : frame){
+    //         f = f/maxMag;
+    //     }
+    // }
 }
 
 void AudioData::printVals(){
@@ -101,8 +101,13 @@ void AudioData::printVals(){
         }
         cout << endl;
     }
+    cout << "Max: " << maxMag << endl;
 }
 
 vector<float> AudioData::getNormals(){
     return normalSamples;
+}
+
+vector<vector<float>>& AudioData::getFreqs(){ 
+    return frequencyHist; 
 }

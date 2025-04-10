@@ -13,6 +13,7 @@ class Playback {
     vector<float> buffer;
     unsigned int bufferSize = 512;
     size_t samplesPlayed = 0;
+    size_t framesPlayed = 0;
 
     public:
 
@@ -23,6 +24,8 @@ class Playback {
                              RtAudioStreamStatus status, void *userData);
 
     void start();
+
+    size_t getFramesPlayed();
 
     void stop();
 

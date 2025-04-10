@@ -41,9 +41,9 @@ class AudioData {
 
     void printVals();
 
-    void normalizeData();
-
     vector<float> getNormals();
+
+    vector<vector<float>>& getFreqs();
 
 };
 

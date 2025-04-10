@@ -14,20 +14,20 @@ int main(int argc, char *argv[]) {
         return 1;
     }
 
-    unique_ptr<AudioData> aud;
+    shared_ptr<AudioData> aud;
 
     try{
-        aud = make_unique<AudioData>(argv[1]);
+        aud = make_shared<AudioData>(argv[1]);
     }
     catch(std::runtime_error& e){
         cerr << e.what() << endl;
         return 1;
     }
-    aud->preProcess();
 
-    vector<float> norms = aud->getNormals();
-    shared_ptr<Playback> audioHandler = make_shared<Playback>(norms);
-    unique_ptr<Engine> engine = make_unique<Engine>(audioHandler);
+    aud->preProcess();
+    //aud->printVals();
+    
+    unique_ptr<Engine> engine = make_unique<Engine>(aud);
 
     while (!engine->shouldClose()) {
         engine->processInput();

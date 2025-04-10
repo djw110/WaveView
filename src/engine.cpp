@@ -6,11 +6,12 @@ state screen;
 // Colors
 color originalFill, hoverFill, pressFill;
 
-Engine::Engine(const shared_ptr<Playback>& pb) : keys() {
+Engine::Engine(const shared_ptr<AudioData>& ad) : keys() {
     this->initWindow();
     this->initShaders();
     this->initShapes();
-    this->initPlayback(pb);
+    this->initData(ad);
+    this->initPlayback();
 
     originalFill = {1, 0, 0, 1};
     hoverFill.vec = originalFill.vec + vec4{0.5, 0.5, 0.5, 0};
@@ -18,10 +19,6 @@ Engine::Engine(const shared_ptr<Playback>& pb) : keys() {
 }
 
 Engine::~Engine() {}
-
-void Engine::preProcessFreqs(vector<vector<float>> freqData){
-    frequencyHistory = freqData;
-}
 
 unsigned int Engine::initWindow(bool debug) {
     // glfw: initialize and configure
@@ -73,9 +70,9 @@ void Engine::initShaders() {
 
 void Engine::initShapes() {
     color barFill = {1, 0, 1, 1};
-    float barWidth = (width - (8) * 25) / 9;
+    float barWidth = (width - (6) * 25) / 7;
     float margin = barWidth / 2;
-    for (int i = 0; i < 9; ++i){
+    for (int i = 0; i < 8; ++i){
         int x = margin + i * (barWidth + 20) + margin / 3;
         int y = 100;
         bars.push_back(std::make_unique<Rect>(shapeShader, vec2{x, y}, vec2{barWidth, 0}, barFill));
@@ -84,12 +81,17 @@ void Engine::initShapes() {
 }
 
 void Engine::scaleUp(unique_ptr<Shape>& shape, float scale){
-    shape->setSizeY(scale * 300);
-    shape->setPosY(100 + (scale * 300 / 2));
+    shape->setSizeY(2.5 * scale);
+    shape->setPosY(100 + (2.5 * scale / 2));
 }
 
-void Engine::initPlayback(const shared_ptr<Playback>& pb){
-    audioHandler = pb;
+void Engine::initPlayback(){
+    audioPlayback = std::make_shared<Playback>(dataHandler->getNormals());
+}
+
+void Engine::initData(const shared_ptr<AudioData>& ad){
+    dataHandler = ad;
+    frequencyHistory = dataHandler->getFreqs();
 }
 
 void Engine::processInput() {
@@ -106,7 +108,7 @@ void Engine::processInput() {
     // Close window if escape key is pressed
     if (keys[GLFW_KEY_ESCAPE]){
         glfwSetWindowShouldClose(window, true);
-        audioHandler->stop();
+        audioPlayback->stop();
     }
 
     // Mouse position saved to check for collisions
@@ -115,7 +117,7 @@ void Engine::processInput() {
     if (keys[GLFW_KEY_S]){
         if(screen == start){
             screen = play;
-            audioHandler->start();
+            audioPlayback->start();
         }
     }
 
@@ -144,6 +146,15 @@ void Engine::update() {
     deltaTime = currentFrame - lastFrame;
     lastFrame = currentFrame;
 
+    if(screen == play){
+        size_t framesPlayed = audioPlayback->getFramesPlayed();
+        for(int i = 0; i < 3; ++i){
+            scaleUp(bars[i],frequencyHistory[framesPlayed][i] + 1);
+            scaleUp(bars[6-i],frequencyHistory[framesPlayed][i] + 1);
+        }
+        scaleUp(bars[3],frequencyHistory[framesPlayed][3] + 1);
+    }
+    
 }
 
 void Engine::render() {

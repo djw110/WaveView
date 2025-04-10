@@ -20,6 +20,7 @@ int Playback::audioCallback(void* outputBuffer, void*, unsigned int bufferFrames
             }
         }
     }
+    self->framesPlayed++;
 
     return 0;
 }
@@ -50,4 +51,8 @@ void Playback::stop() {
     if (dac.isStreamOpen()) {
         dac.closeStream();
     }
+}
+
+size_t Playback::getFramesPlayed(){ 
+    return framesPlayed; 
 }
