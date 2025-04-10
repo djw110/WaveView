@@ -72,12 +72,24 @@ void Engine::initShaders() {
 }
 
 void Engine::initShapes() {
+    color barFill = {1, 0, 1, 1};
+    float barWidth = (width - (8) * 25) / 9;
+    float margin = barWidth / 2;
+    for (int i = 0; i < 9; ++i){
+        int x = margin + i * (barWidth + 20) + margin / 3;
+        int y = 100;
+        bars.push_back(std::make_unique<Rect>(shapeShader, vec2{x, y}, vec2{barWidth, 0}, barFill));
+    }
+    hovered.resize(bars.size(), false);
+}
 
-    hovered.resize(buttons.size(), false);
+void Engine::scaleUp(unique_ptr<Shape>& shape, float scale){
+    shape->setSizeY(scale * 300);
+    shape->setPosY(100 + (scale * 300 / 2));
 }
 
 void Engine::initPlayback(const shared_ptr<Playback>& pb){
-    playBack = pb;
+    audioHandler = pb;
 }
 
 void Engine::processInput() {
@@ -94,7 +106,7 @@ void Engine::processInput() {
     // Close window if escape key is pressed
     if (keys[GLFW_KEY_ESCAPE]){
         glfwSetWindowShouldClose(window, true);
-        playBack->stop();
+        audioHandler->stop();
     }
 
     // Mouse position saved to check for collisions
@@ -103,7 +115,7 @@ void Engine::processInput() {
     if (keys[GLFW_KEY_S]){
         if(screen == start){
             screen = play;
-            playBack->start();
+            audioHandler->start();
         }
     }
 
@@ -115,8 +127,8 @@ void Engine::processInput() {
     bool mousePressed = glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS;
     bool mouseReleased = false;
 
-    for(int i = 0; i < buttons.size(); ++i){
-        if(buttons[i]->isOverlapping(vec2(MouseX, MouseY))){
+    for(int i = 0; i < bars.size(); ++i){
+        if(bars[i]->isOverlapping(vec2(MouseX, MouseY))){
             hovered[i] = true;
         }
         else{
@@ -150,7 +162,7 @@ void Engine::render() {
         }
         case play: {
             shapeShader.use();
-            for(unique_ptr<Shape>& c : buttons){
+            for(unique_ptr<Shape>& c : bars){
                 c->setUniforms();
                 c->draw();
             }

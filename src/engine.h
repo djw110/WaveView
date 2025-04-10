@@ -22,7 +22,7 @@ private:
     GLFWwindow* window{};
 
     /// @brief The width and height of the window.
-    const unsigned int width = 900, height = 900; // Window dimensions
+    const unsigned int width = 1500, height = 900; // Window dimensions
     /// @brief The projection matrix
     const glm::mat4 projection = glm::ortho(0.0f, (float)width, 0.0f, (float)height);
 
@@ -41,10 +41,10 @@ private:
     /// @details Initialized in initShaders()
     unique_ptr<FontRenderer> fontRenderer;
 
-    shared_ptr<Playback> playBack;
+    shared_ptr<Playback> audioHandler;
 
     // Shapes
-    vector<unique_ptr<Shape>> buttons;
+    vector<unique_ptr<Shape>> bars;
 
     vector<bool> hovered;
 
@@ -91,6 +91,8 @@ public:
     /// @brief Renders the game state.
     /// @details Displays/renders objects on the screen.
     void render();
+
+    void scaleUp(unique_ptr<Shape>& shape, float scale);
 
     void preProcessFreqs(vector<vector<float>> freqData);
 

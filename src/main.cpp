@@ -26,10 +26,8 @@ int main(int argc, char *argv[]) {
     aud->preProcess();
 
     vector<float> norms = aud->getNormals();
-
-    shared_ptr<Playback> pb = make_shared<Playback>(norms);
-
-    unique_ptr<Engine> engine = make_unique<Engine>(pb);
+    shared_ptr<Playback> audioHandler = make_shared<Playback>(norms);
+    unique_ptr<Engine> engine = make_unique<Engine>(audioHandler);
 
     while (!engine->shouldClose()) {
         engine->processInput();
