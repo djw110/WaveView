@@ -8,10 +8,10 @@ color originalFill, hoverFill, pressFill;
 
 Engine::Engine(const shared_ptr<AudioData>& ad) : keys() {
     this->initWindow();
-    this->initShaders();
-    this->initShapes();
     this->initData(ad);
     this->initPlayback();
+    this->initShaders();
+    this->initShapes();
 
     originalFill = {1, 0, 0, 1};
     hoverFill.vec = originalFill.vec + vec4{0.5, 0.5, 0.5, 0};
@@ -69,11 +69,14 @@ void Engine::initShaders() {
 }
 
 void Engine::initShapes() {
-    color barFill = {1, 0, 1, 1};
-    float barWidth = (width - (6) * 25) / 7;
-    float margin = barWidth / 2;
-    for (int i = 0; i < 8; ++i){
-        int x = margin + i * (barWidth + 20) + margin / 3;
+    size_t numBars = (2 * (numBins - 2)) + 1;
+    cout << numBars << endl;
+    cout << numBins << endl;
+    color barFill = {1, 180/255.0f, 0/255.0f, 1};
+    float barWidth = (width - (numBars - 1) * 25) / numBars + 1;
+    float margin = barWidth;
+    for (int i = 0; i < numBars; ++i){
+        int x = margin + i * (barWidth + 20);
         int y = 100;
         bars.push_back(std::make_unique<Rect>(shapeShader, vec2{x, y}, vec2{barWidth, 0}, barFill));
     }
@@ -92,6 +95,7 @@ void Engine::initPlayback(){
 void Engine::initData(const shared_ptr<AudioData>& ad){
     dataHandler = ad;
     frequencyHistory = dataHandler->getFreqs();
+    numBins = frequencyHistory[0].size();
 }
 
 void Engine::processInput() {
@@ -148,11 +152,12 @@ void Engine::update() {
 
     if(screen == play){
         size_t framesPlayed = audioPlayback->getSamplesPlayed() / dataHandler->getOverlap();
-        for(int i = 0; i < 3; ++i){
+        size_t barIndex = numBins - 2;
+        for(int i = 0; i < (barIndex); ++i){
             scaleUp(bars[i],frequencyHistory[framesPlayed][i] + 1);
-            scaleUp(bars[6-i],frequencyHistory[framesPlayed][i] + 1);
+            scaleUp(bars[bars.size()-1-i],frequencyHistory[framesPlayed][i] + 1);
         }
-        scaleUp(bars[3],frequencyHistory[framesPlayed][3] + 1);
+        scaleUp(bars[barIndex],frequencyHistory[framesPlayed][barIndex] + 1);
     }
     
 }

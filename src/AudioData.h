@@ -23,7 +23,7 @@ class AudioData {
 
     vector<vector<float>> frequencyHist;
     vector<vector<float>> audioFrames;
-    vector<float> bins = {0.0f, 100.0f, 1000.0f, 5000.0f, sampleRate / 2.0f};
+    vector<float> bins = {0.0f, 50.0f, 126.0f, 316.0f, 794.0f, 1495.0f, 3000.0f, 6000.0f, 10000.0f, sampleRate / 2.0f};
     vector<float> normalSamples;
 
     kiss_fft_cfg fftCfg = kiss_fft_alloc(frameSize, 0, NULL, NULL); // Configuration for the FFT

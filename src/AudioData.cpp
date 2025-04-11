@@ -86,12 +86,6 @@ void AudioData::preProcess(){
 
         frequencyHist.push_back(binMagnitudes);
     }
-
-    // for(vector<float>& frame : frequencyHist){
-    //     for(float& f : frame){
-    //         f = f/maxMag;
-    //     }
-    // }
 }
 
 void AudioData::printVals(){

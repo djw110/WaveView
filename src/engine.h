@@ -22,7 +22,7 @@ private:
     GLFWwindow* window{};
 
     /// @brief The width and height of the window.
-    const unsigned int width = 1200, height = 900; // Window dimensions
+    const unsigned int width = 1400, height = 1000; // Window dimensions
     /// @brief The projection matrix
     const glm::mat4 projection = glm::ortho(0.0f, (float)width, 0.0f, (float)height);
 
@@ -40,6 +40,8 @@ private:
     /// @brief Responsible for rendering text on the screen.
     /// @details Initialized in initShaders()
     unique_ptr<FontRenderer> fontRenderer;
+
+    size_t numBins;
 
     unsigned int pj = 0;
 
